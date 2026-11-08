@@ -220,13 +220,3 @@ python app.py
 ```
 
 `config.py` holds paths and environment settings. `store.py` opens the ChromaDB collection and loads the embedding model once, so ingestion and question answering use the same model.
-
-## Limitations
-
-- Scanned PDFs that do not already contain selectable text are skipped. This project does not run OCR.
-- Password-protected PDFs are reported as unreadable and are not indexed.
-- A page number in the citation is the PDF page, which can differ from a printed page number inside the document.
-- Headers and footers are kept in the text, so some chunks repeat a running header.
-- `llama3.2:3b` is a small model. It can phrase an answer awkwardly, as in the Horus Heresy example, which still contains `(S1)` beside the checked page citation. Check the sources list.
-- The relevance cutoff is tuned for `all-MiniLM-L6-v2`. Set `RELEVANCE_THRESHOLD` if you change the embedding model, then delete `chroma_db` and run `python ingest.py` again.
-- The web page has no accounts, no file upload, and no chat history. Ollama must be running locally (or at the configured server address) to generate answers.
