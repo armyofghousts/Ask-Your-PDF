@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ask Your PDFs</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main>
+    <h1>Ask Your PDFs</h1>
+    <p class="description">
+      Ask a question about the PDF files in the pdfs folder.
+      The answer uses only those documents and cites the file name and page.
+    </p>
+
+    <form method="post" action="/">
+      <label for="question">Question</label>
+      <textarea id="question" name="question" rows="3" required>{{ question }}</textarea>
+      <button type="submit">Ask</button>
+    </form>
+
+    {% if error %}
+    <section class="panel error" role="alert">
+      <h2>Something went wrong</h2>
+      <p>{{ error }}</p>
+    </section>
+    {% endif %}
+
+    {% if answer %}
+    <section class="panel {% if answer == dont_know %}notice{% endif %}">
+      <h2>Answer</h2>
+      <p class="answer">{{ answer }}</p>
+    </section>
+    {% endif %}
+
+    {% if sources %}
+    <section class="panel">
+      <h2>Sources</h2>
+      <ul class="sources">
+        {% for source in sources %}
+        <li>
+          <p class="citation">
+            {{ source.citation }}
+            <span class="score">similarity {{ "%.2f"|format(source.similarity) }}</span>
+          </p>
+          <p class="snippet">{{ source.snippet }}</p>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  </main>
+</body>
+</html>
