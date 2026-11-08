@@ -1,5 +1,3 @@
-"""Retrieve PDF chunks and ask a local Ollama model for a cited answer."""
-
 import re
 
 import requests
@@ -23,19 +21,14 @@ Write a short answer in plain sentences."""
 
 
 class IndexEmptyError(Exception):
-    """Raised when ChromaDB has no chunks yet."""
+    pass
 
 
 class OllamaError(Exception):
-    """Raised when the local Ollama server cannot answer."""
+    pass
 
 
 def cosine_similarity(distance) -> float:
-    """Convert Chroma cosine distance into a similarity score.
-
-    For a collection created with hnsw:space cosine, distance = 1 - cosine
-    similarity. This conversion is not meaningful for L2 distance.
-    """
     return 1.0 - float(distance)
 
 
@@ -44,12 +37,6 @@ def citation_for(filename, page) -> str:
 
 
 def format_citations(answer, sources) -> str:
-    """Rewrite source tags and drop citations that were not retrieved.
-
-    A citation is kept only when its filename and page were in the retrieved
-    chunks. Answers that end up with no valid citation become the standard
-    "I don't know" sentence, so the model cannot invent a source.
-    """
     by_tag = {}
     allowed = set()
     for source in sources:
@@ -84,9 +71,6 @@ def format_citations(answer, sources) -> str:
     if _is_refusal(text):
         return DONT_KNOW
 
-    # The model sometimes answers from a passage without emitting a source tag.
-    # Keep the answer only when a long phrase from it appears in a retrieved
-    # passage, and attach that passage's real filename and page.
     supported = _overlapping_sources(text, sources)
     if not supported:
         return DONT_KNOW
@@ -120,7 +104,6 @@ def _collapse_repeated_citations(text) -> str:
 
 
 def _overlapping_sources(answer, sources):
-    """Return sources that contain a long phrase from the answer."""
     words = " ".join(answer.lower().split()).split()
     if len(words) < 6:
         return []
@@ -136,11 +119,6 @@ def _overlapping_sources(answer, sources):
 
 
 def retrieve(question, chroma_dir=None, embedder=None):
-    """Return the nearest chunks, best match first.
-
-    Each hit includes filename, 1-based page, text, distance, and similarity.
-    The caller decides which hits clear the relevance threshold.
-    """
     collection = open_collection(chroma_dir)
     if collection.count() == 0:
         raise IndexEmptyError(
@@ -207,7 +185,6 @@ def build_messages(question, sources):
 
 
 def ensure_ollama():
-    """Fail with a short message if Ollama or the configured model is missing."""
     base_url = config.ollama_base_url()
     model = config.ollama_model()
     try:
@@ -242,7 +219,6 @@ def ensure_ollama():
 
 
 def generate_answer(question, sources):
-    """Send the question and the retrieved passages to Ollama."""
     ensure_ollama()
     base_url = config.ollama_base_url()
     model = config.ollama_model()
@@ -319,7 +295,6 @@ def _public_sources(sources):
 
 
 def answer_question(question, chroma_dir=None, embedder=None):
-    """Answer one question. Returns answer, sources, and an error message."""
     cleaned = (question or "").strip()
     if not cleaned:
         return _result(error="Please enter a question.")

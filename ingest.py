@@ -1,10 +1,3 @@
-"""Read PDFs from the pdfs folder and store page chunks in ChromaDB.
-
-Run this once after adding or changing PDFs:
-
-    python ingest.py
-"""
-
 import hashlib
 from pathlib import Path
 
@@ -15,11 +8,6 @@ from store import embed_texts, open_collection
 
 
 def chunk_text(text, chunk_size=config.CHUNK_SIZE, overlap=config.CHUNK_OVERLAP):
-    """Split text into chunks of about chunk_size characters.
-
-    Neighboring chunks share `overlap` characters. Whitespace is collapsed so
-    a page number and a line break do not create tiny fragments.
-    """
     if chunk_size <= 0:
         raise ValueError("chunk_size must be positive")
     if overlap < 0 or overlap >= chunk_size:
@@ -56,10 +44,6 @@ def chunk_id(filename, file_hash, page, index) -> str:
 
 
 def extract_pages(path: Path):
-    """Return (pages, error). pages is a list of (page_number, text).
-
-    Page numbers are 1-based, matching the page numbers a reader sees.
-    """
     try:
         document = pymupdf.open(path)
     except Exception as exc:
@@ -104,7 +88,6 @@ def _embed(texts, embedder):
 
 
 def ingest(pdf_dir=None, chroma_dir=None, embedder=None):
-    """Index every PDF in pdf_dir. Re-running updates changed files only."""
     pdf_directory = config.pdf_dir() if pdf_dir is None else Path(pdf_dir)
     if not pdf_directory.is_dir():
         raise FileNotFoundError(

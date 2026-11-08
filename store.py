@@ -1,5 +1,3 @@
-"""Persistent ChromaDB collection and the shared embedding model."""
-
 import config
 
 _model = None
@@ -7,7 +5,6 @@ _PrecomputedEmbeddings = None
 
 
 def _precomputed_embeddings_class():
-    """Build a Chroma embedding-function stub once Chroma itself is imported."""
     global _PrecomputedEmbeddings
     if _PrecomputedEmbeddings is not None:
         return _PrecomputedEmbeddings
@@ -17,12 +14,6 @@ def _precomputed_embeddings_class():
 
     @register_embedding_function
     class PrecomputedEmbeddings(EmbeddingFunction[Documents]):
-        """Placeholder so Chroma does not download its own ONNX model.
-
-        Ingestion and retrieval compute vectors with sentence-transformers and
-        pass those vectors in directly.
-        """
-
         def __init__(self):
             pass
 
@@ -48,7 +39,6 @@ def _precomputed_embeddings_class():
 
 
 def open_collection(chroma_dir=None):
-    """Open the persistent chunk collection, creating it if needed."""
     import chromadb
 
     path = config.chroma_dir() if chroma_dir is None else chroma_dir
@@ -56,8 +46,6 @@ def open_collection(chroma_dir=None):
     client = chromadb.PersistentClient(path=str(path))
     collection = client.get_or_create_collection(
         name=config.COLLECTION_NAME,
-        # Cosine distance is fixed when the collection is created.
-        # Chroma then returns distance = 1 - cosine similarity.
         configuration={"hnsw": {"space": "cosine"}},
         embedding_function=_precomputed_embeddings_class()(),
     )
@@ -71,7 +59,6 @@ def open_collection(chroma_dir=None):
 
 
 def distance_space(collection):
-    """Return the distance metric stored for a collection, if Chroma exposes it."""
     metadata = getattr(collection, "metadata", None) or {}
     if isinstance(metadata, dict) and metadata.get("hnsw:space"):
         return metadata.get("hnsw:space")
@@ -95,7 +82,6 @@ def distance_space(collection):
 
 
 def embed_texts(texts: list[str]) -> list[list[float]]:
-    """Embed texts with all-MiniLM-L6-v2, normalized for cosine similarity."""
     if not texts:
         return []
     model = _embedding_model()

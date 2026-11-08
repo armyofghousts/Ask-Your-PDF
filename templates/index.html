@@ -9,10 +9,6 @@
 <body>
   <main>
     <h1>Ask Your PDFs</h1>
-    <p class="description">
-      Ask a question about the PDF files in the pdfs folder.
-      The answer uses only those documents and cites the file name and page.
-    </p>
 
     <form method="post" action="/">
       <label for="question">Question</label>
@@ -40,10 +36,7 @@
       <ul class="sources">
         {% for source in sources %}
         <li>
-          <p class="citation">
-            {{ source.citation }}
-            <span class="score">similarity {{ "%.2f"|format(source.similarity) }}</span>
-          </p>
+          <p class="citation">{{ source.citation }}</p>
           <p class="snippet">{{ source.snippet }}</p>
         </li>
         {% endfor %}

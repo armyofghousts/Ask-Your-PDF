@@ -1,9 +1,6 @@
-"""Paths and settings shared by ingestion, retrieval, and the web app."""
-
 import os
 from pathlib import Path
 
-# ChromaDB reads this when it is imported. Keep it off for a local homework app.
 os.environ.setdefault("ANONYMIZED_TELEMETRY", "False")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
@@ -15,11 +12,7 @@ CHUNK_SIZE = 800
 CHUNK_OVERLAP = 150
 TOP_K = 5
 
-# Chroma cosine distance is 1 - cosine similarity. all-MiniLM-L6-v2 vectors are
-# normalized, so similarity usually falls between 0 and 1. On the included
-# sample PDFs, clearly related questions scored about 0.63 to 0.75 and
-# unrelated questions scored about 0.22 to 0.41. The default cutoff of 0.45
-# sits between those two groups. A different embedding model needs its own value.
+
 DEFAULT_RELEVANCE_THRESHOLD = 0.45
 
 DONT_KNOW = "I don't know based on the provided documents."

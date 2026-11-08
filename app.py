@@ -1,13 +1,4 @@
-"""Minimal web interface for Ask Your PDFs.
-
-Start the application with:
-
-    python app.py
-
-Then open http://127.0.0.1:5000
-"""
-
-import config  # noqa: F401  -- sets local-only defaults before ChromaDB loads
+import config  
 from flask import Flask, render_template, request
 
 from rag import DONT_KNOW, answer_question
